@@ -67,4 +67,50 @@ $app->put('/clients/{id}', function (Request $request, $id) use ($app) {
     );
 });
 
+$app->post('/clients', function (Request $request) use ($app) {
+    $result = array();
+
+    try {
+        $client = ORM::for_table('client')->create();
+        $values = json_decode($request->getContent());
+
+        foreach ($values as $k => $v)  {
+            $client->set($k, $v);
+        }
+
+        $client->save();
+
+        $result['success'] = true;
+    } catch (Exception $exc) {
+        $app['monolog']->addError($exc->getMessage());
+        $result['success'] = false;
+    }
+
+    return new Response(
+        json_encode($result),
+        200,
+        array('Content-Type' => 'application/json')
+    );
+});
+
+$app->delete('/clients/{id}', function () use ($app) {
+    $result = array();
+
+    try {
+        $client = ORM::for_table('client')->find_one($id);
+        $client->delete();
+
+        $result['success'] = true;
+    } catch (Exception $exc) {
+        $app['monolog']->addError($exc->getMessage());
+        $result['success'] = false;
+    }
+
+    return new Response(
+        json_encode($result),
+        200,
+        array('Content-Type' => 'application/json')
+    );
+});
+
 $app->run();
