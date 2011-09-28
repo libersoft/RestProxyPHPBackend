@@ -17,17 +17,24 @@ ORM::configure('password', 'toor');
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-$app->get('/clients', function () use ($app) {
+$app->get('/{class}', function (Request $request, $class) use ($app) {
+    $page = $request->get('page');
+    $start = $request->get('start');
+    $limit = $request->get('limit');
+
     $result = array();
 
     try {
         $result['data'] = array();
 
-        $clients = ORM::for_table('client')->find_many();
-        foreach ($clients as $client) {
-            $result['data'][] = $client->as_array();
+        $objects = ORM::for_table($class)
+                ->offset($start)
+                ->limit($limit)
+                ->find_many();
+        foreach ($objects as $object) {
+            $result['data'][] = $object->as_array();
         }
-        $result['total'] = count($clients);
+        $result['total'] = count($objects);
 
         $result['success'] = true;
     } catch (Exception $exc) {
@@ -43,19 +50,19 @@ $app->get('/clients', function () use ($app) {
     );
 });
 
-$app->put('/clients/{id}', function (Request $request, $id) use ($app) {
+$app->put('/{class}/{id}', function (Request $request, $class, $id) use ($app) {
     $result = array();
 
     try {
-        $client = ORM::for_table('client')->find_one($id);
+        $object = ORM::for_table($class)->find_one($id);
         $values = json_decode($request->getContent());
 
         foreach ($values as $k => $v)  {
-            $client->set($k, $v);
+            $object->set($k, $v);
         }
 
-        $client->save();
-        $result['data'][] = $client->as_array();
+        $object->save();
+        $result['data'][] = $object->as_array();
 
         $result['success'] = true;
     } catch (Exception $exc) {
@@ -71,19 +78,19 @@ $app->put('/clients/{id}', function (Request $request, $id) use ($app) {
     );
 });
 
-$app->post('/clients', function (Request $request) use ($app) {
+$app->post('/{class}', function (Request $request, $class) use ($app) {
     $result = array();
 
     try {
-        $client = ORM::for_table('client')->create();
+        $object = ORM::for_table($class)->create();
         $values = json_decode($request->getContent());
 
         foreach ($values as $k => $v)  {
-            $client->set($k, $v);
+            $object->set($k, $v);
         }
 
-        $client->save();
-        $result['data'][] = $client->as_array();
+        $object->save();
+        $result['data'][] = $object->as_array();
 
         $result['success'] = true;
     } catch (Exception $exc) {
@@ -99,14 +106,14 @@ $app->post('/clients', function (Request $request) use ($app) {
     );
 });
 
-$app->delete('/clients/{id}', function ($id) use ($app) {
+$app->delete('/{class}/{id}', function ($class, $id) use ($app) {
     $result = array();
 
     try {
-        $client = ORM::for_table('client')->find_one($id);
-        $result['data'] = $client->as_array();
+        $object = ORM::for_table($class)->find_one($id);
+        $result['data'] = $object->as_array();
 
-        $client->delete();
+        $object->delete();
         $result['success'] = true;
     } catch (Exception $exc) {
         $app['monolog']->addError($exc->getMessage());

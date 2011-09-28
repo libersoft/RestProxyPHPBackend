@@ -7,7 +7,7 @@ Ext.define('AC.model.Client', {
     ],
     proxy: {
         type: 'rest',
-        url: 'data.php/clients',
+        url: 'data.php/contact',
         reader: {
             type: 'json',
             root: 'data',
