@@ -12,6 +12,19 @@ Ext.define('AC.view.client.List' ,{
             {header: 'Email', dataIndex: 'email', flex: 1}
         ];
 
+        this.dockedItems = [{
+            xtype: 'toolbar',
+            items: [{
+                text: 'Ricarica',
+                itemId: 'reload'
+            }]
+        }]
+
         this.callParent(arguments);
+//        this.getSelectionModel().on('selectionchange', this.onSelectChange, this);
+    },
+
+    onSelectChange: function(selModel, selections){
+        this.down('#delete').setDisabled(selections.length === 0);
     }
 });

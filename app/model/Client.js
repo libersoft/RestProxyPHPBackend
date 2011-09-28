@@ -4,5 +4,15 @@ Ext.define('AC.model.Client', {
         { name: 'id', type: 'int' },
         { name: 'name', type: 'string' },
         { name: 'email', type: 'string' }
-    ]
+    ],
+    proxy: {
+        type: 'rest',
+        url: 'data.php/clients',
+        reader: {
+            type: 'json',
+            root: 'data',
+            idProperty: 'id',
+            messageProperty: 'message'
+        }
+    }
 });

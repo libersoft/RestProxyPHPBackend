@@ -15,6 +15,9 @@ Ext.define('AC.controller.Clients', {
             },
             'clientedit button[action=save]': {
                 click: this.updateClient
+            },
+            'clientlist toolbar #reload': {
+                click: this.reload
             }
         });
     },
@@ -27,12 +30,52 @@ Ext.define('AC.controller.Clients', {
 
     updateClient: function(button) {
         var win    = button.up('window'),
-            form   = win.down('form'),
+            form   = win.down('form').getForm(),
             record = form.getRecord(),
-            values = form.getValues();
+            values = form.getValues(),
+            store  = this.getStore('Clients');
 
-        record.set(values);
-        win.close();
-        this.getClientsStore().sync();
+        if (form.isValid()) {
+            record.set(values);
+            record.save({
+                success: function(data) {
+                    record.commit();
+                    win.close();
+                },
+                failure: function(data) {
+                    Ext.Msg.alert('Failure', 'Failed to save object.')
+                },
+                scope: this
+            });
+        } else {
+            Ext.Msg.alert('Invalid Data', 'Please correct form errors.')
+        }
+    },
+
+    addClient: function(button) {
+        var view = Ext.widget('clientedit');
+
+        view.down('form').loadRecord(Ext.create('AC.model.Client'));
+    },
+
+    deleteClient: function(button) {
+        var view      = Ext.ComponentQuery.query('clientlist')[0],
+            selection = view.getSelectionModel().getSelection()[0],
+            store     = this.getStore('Clients');
+
+        if (selection) {
+            selection.destroy({
+                success: function(data) {
+                    store.remove(selection);
+                },
+                failure: function(data) {
+                    Ext.Msg.alert('Failure', 'Failed to delete object.')
+                }
+            });
+        }
+    },
+
+    reload: function(button) {
+        this.getStore('Clients').load();
     }
 });

@@ -4,7 +4,6 @@ require_once __DIR__.'/vendor/silex.phar';
 require_once __DIR__.'/vendor/idiorm/idiorm.php';
 
 $app = new Silex\Application();
-$app['debug'] = true;
 
 $app->register(new Silex\Provider\MonologServiceProvider(), array(
     'monolog.logfile'       => __DIR__.'/development.log',
@@ -22,15 +21,18 @@ $app->get('/clients', function () use ($app) {
     $result = array();
 
     try {
-        $result['clients'] = array();
+        $result['data'] = array();
 
-        foreach (ORM::for_table('client')->find_many() as $client) {
-            $result['clients'][] = $client->as_array();
+        $clients = ORM::for_table('client')->find_many();
+        foreach ($clients as $client) {
+            $result['data'][] = $client->as_array();
         }
+        $result['total'] = count($clients);
 
         $result['success'] = true;
     } catch (Exception $exc) {
         $app['monolog']->addError($exc->getMessage());
+        $result['message'] = $exc->getMessage();
         $result['success'] = false;
     }
 
@@ -53,10 +55,12 @@ $app->put('/clients/{id}', function (Request $request, $id) use ($app) {
         }
 
         $client->save();
+        $result['data'][] = $client->as_array();
 
         $result['success'] = true;
     } catch (Exception $exc) {
         $app['monolog']->addError($exc->getMessage());
+        $result['message'] = $exc->getMessage();
         $result['success'] = false;
     }
 
@@ -79,10 +83,12 @@ $app->post('/clients', function (Request $request) use ($app) {
         }
 
         $client->save();
+        $result['data'][] = $client->as_array();
 
         $result['success'] = true;
     } catch (Exception $exc) {
         $app['monolog']->addError($exc->getMessage());
+        $result['message'] = $exc->getMessage();
         $result['success'] = false;
     }
 
@@ -93,16 +99,18 @@ $app->post('/clients', function (Request $request) use ($app) {
     );
 });
 
-$app->delete('/clients/{id}', function () use ($app) {
+$app->delete('/clients/{id}', function ($id) use ($app) {
     $result = array();
 
     try {
         $client = ORM::for_table('client')->find_one($id);
-        $client->delete();
+        $result['data'] = $client->as_array();
 
+        $client->delete();
         $result['success'] = true;
     } catch (Exception $exc) {
         $app['monolog']->addError($exc->getMessage());
+        $result['message'] = $exc->getMessage();
         $result['success'] = false;
     }
 
