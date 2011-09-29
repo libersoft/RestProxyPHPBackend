@@ -1,13 +1,13 @@
 <?php
 
-require_once __DIR__.'/vendor/silex.phar';
-require_once __DIR__.'/vendor/idiorm/idiorm.php';
+require_once __DIR__.'/../vendor/Silex/silex.phar';
+require_once __DIR__.'/../vendor/Idiorm/idiorm.php';
 
 $app = new Silex\Application();
 
 $app->register(new Silex\Provider\MonologServiceProvider(), array(
-    'monolog.logfile'       => __DIR__.'/development.log',
-    'monolog.class_path'    => __DIR__.'/vendor/monolog/src',
+    'monolog.logfile'       => __DIR__.'/../log/development.log',
+    'monolog.class_path'    => __DIR__.'/../vendor/Monolog/src',
 ));
 
 ORM::configure('mysql:host=localhost;dbname=idiorm');
@@ -128,4 +128,4 @@ $app->delete('/{class}/{id}', function ($class, $id) use ($app) {
     );
 });
 
-$app->run();
+return $app;
