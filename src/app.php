@@ -1,18 +1,21 @@
 <?php
 
 require_once __DIR__.'/../vendor/Silex/silex.phar';
-require_once __DIR__.'/../vendor/Idiorm/idiorm.php';
 
 $app = new Silex\Application();
+
+$app['autoloader']->registerNamespaces(array('Libersoft' => __DIR__));
 
 $app->register(new Silex\Provider\MonologServiceProvider(), array(
     'monolog.logfile'       => __DIR__.'/../log/development.log',
     'monolog.class_path'    => __DIR__.'/../vendor/Monolog/src',
 ));
 
-ORM::configure('mysql:host=localhost;dbname=idiorm');
-ORM::configure('username', 'root');
-ORM::configure('password', 'toor');
+$app->register(new Libersoft\IdiormServiceProvider(), array(
+    'idiorm.dsn'      => 'mysql:host=localhost;dbname=idiorm',
+    'idiorm.username' => 'root',
+    'idiorm.password' => 'toor'
+));
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,7 +30,7 @@ $app->get('/{class}', function (Request $request, $class) use ($app) {
     try {
         $result['data'] = array();
 
-        $objects = ORM::for_table($class)
+        $objects = $app['idiorm']->getTable($class)
                 ->offset($start)
                 ->limit($limit)
                 ->find_many();
@@ -54,7 +57,7 @@ $app->put('/{class}/{id}', function (Request $request, $class, $id) use ($app) {
     $result = array();
 
     try {
-        $object = ORM::for_table($class)->find_one($id);
+        $object = $app['idiorm']->getTable($class)->find_one($id);
         $values = json_decode($request->getContent());
 
         foreach ($values as $k => $v)  {
@@ -82,7 +85,7 @@ $app->post('/{class}', function (Request $request, $class) use ($app) {
     $result = array();
 
     try {
-        $object = ORM::for_table($class)->create();
+        $object = $app['idiorm']->getTable($class)->create();
         $values = json_decode($request->getContent());
 
         foreach ($values as $k => $v)  {
@@ -110,7 +113,7 @@ $app->delete('/{class}/{id}', function ($class, $id) use ($app) {
     $result = array();
 
     try {
-        $object = ORM::for_table($class)->find_one($id);
+        $object = $app['idiorm']->getTable($class)->find_one($id);
         $result['data'] = $object->as_array();
 
         $object->delete();
