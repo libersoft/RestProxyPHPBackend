@@ -21,9 +21,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 $app->get('/{class}', function (Request $request, $class) use ($app) {
-    $page = $request->get('page');
-    $start = $request->get('start');
-    $limit = $request->get('limit');
+    $page = $request->get('page') ?: 1;
+    $start = $request->get('start') ?: 0;
+    $limit = $request->get('limit') ?: 25;
 
     $result = array();
 
@@ -37,7 +37,8 @@ $app->get('/{class}', function (Request $request, $class) use ($app) {
         foreach ($objects as $object) {
             $result['data'][] = $object->as_array();
         }
-        $result['total'] = count($objects);
+
+        $result['total'] = $app['idiorm']->getTable($class)->count();
 
         $result['success'] = true;
     } catch (Exception $exc) {

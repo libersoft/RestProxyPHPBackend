@@ -13,18 +13,12 @@ Ext.define('AC.view.client.List' ,{
         ];
 
         this.dockedItems = [{
-            xtype: 'toolbar',
-            items: [{
-                text: 'Ricarica',
-                itemId: 'reload'
-            }]
-        }]
+            xtype: 'pagingtoolbar',
+            store: this.store,
+            dock: 'bottom',
+            displayInfo: true
+        }];
 
         this.callParent(arguments);
-//        this.getSelectionModel().on('selectionchange', this.onSelectChange, this);
-    },
-
-    onSelectChange: function(selModel, selections){
-        this.down('#delete').setDisabled(selections.length === 0);
     }
 });
