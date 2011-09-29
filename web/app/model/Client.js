@@ -13,6 +13,7 @@ Ext.define('AC.model.Client', {
             root: 'data',
             idProperty: 'id',
             messageProperty: 'message'
-        }
+        },
+        simpleSortMode: true
     }
 });

@@ -24,17 +24,29 @@ $app->get('/{class}', function (Request $request, $class) use ($app) {
     $page = $request->get('page') ?: 1;
     $start = $request->get('start') ?: 0;
     $limit = $request->get('limit') ?: 25;
+    $sort = $request->get('sort');
 
     $result = array();
 
     try {
         $result['data'] = array();
 
-        $objects = $app['idiorm']->getTable($class)
+        $query = $app['idiorm']->getTable($class)
                 ->offset($start)
-                ->limit($limit)
-                ->find_many();
-        foreach ($objects as $object) {
+                ->limit($limit);
+
+        if (isset($sort)) {
+            switch ($request->get('dir')) {
+                case 'ASC':
+                    $query->order_by_asc($sort);
+                    break;
+                case 'DESC':
+                    $query->order_by_desc($sort);
+                    break;
+            }
+        }
+
+        foreach ($query->find_many() as $object) {
             $result['data'][] = $object->as_array();
         }
 
