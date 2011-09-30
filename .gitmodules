@@ -1,0 +1,6 @@
+[submodule "vendor/Idiorm"]
+	path = vendor/Idiorm
+	url = git://github.com/j4mie/idiorm.git
+[submodule "vendor/Monolog"]
+	path = vendor/Monolog
+	url = git://github.com/Seldaek/monolog.git

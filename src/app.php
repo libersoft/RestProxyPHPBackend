@@ -4,7 +4,7 @@ require_once __DIR__.'/../vendor/Silex/silex.phar';
 
 $app = new Silex\Application();
 
-$app['autoloader']->registerNamespaces(array('Libersoft' => __DIR__));
+$app['autoloader']->registerNamespace('Libersoft', __DIR__);
 
 $app->register(new Silex\Provider\MonologServiceProvider(), array(
     'monolog.logfile'       => __DIR__.'/../log/development.log',

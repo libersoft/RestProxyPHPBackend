@@ -1,4 +1,3 @@
 nbproject/
-extjs/
-vendor/
-*.log
+log/
+web/extjs/
