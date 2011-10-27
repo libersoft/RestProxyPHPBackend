@@ -1,5 +1,5 @@
 - Download Ext JS 4 SDK (http://www.sencha.com/products/extjs/)
 
-- Unzip the package to a new directory called "extjs" within web/
+- Unzip the package to a new directory called "ext-4.0" within web/
 
 - Configure your web server pointing to web/index.html

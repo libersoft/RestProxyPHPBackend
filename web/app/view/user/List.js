@@ -12,22 +12,34 @@ This file may be used under the terms of the GNU General Public License version 
 If you are unsure which license is appropriate for your use, please contact the sales department at http://www.sencha.com/contact.
 
 */
-Ext.application({
-    name: 'AM',
+Ext.define('AM.view.user.List' ,{
+    extend: 'Ext.grid.Panel',
+    alias : 'widget.userlist',
 
-    controllers: [
-        'Users'
+    title : 'All Users',
+    store: 'Users',
+
+    columns: [
+        {header: 'Name',  dataIndex: 'name',  flex: 1},
+        {header: 'Email', dataIndex: 'email', flex: 1}
     ],
 
-    launch: function() {
-        Ext.create('Ext.container.Viewport', {
-            layout: 'fit',
-            items: [
-                {
-                    xtype: 'userlist'
-                }
-            ]
-        });
-    }
+    dockedItems: [{
+        xtype: 'toolbar',
+        items: [{
+            text: 'Add',
+            action: 'add'
+        },
+        {
+            text: 'Delete',
+            action: 'delete'
+        }]
+    },
+    {
+        xtype: 'pagingtoolbar',
+        store: 'Users',
+        dock: 'bottom',
+        displayInfo: true
+    }]
 });
 

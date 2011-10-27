@@ -20,6 +20,27 @@ $app->register(new Libersoft\IdiormServiceProvider(), array(
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+function success($result) {
+    $result['success'] = true;
+
+    return new Response(
+        json_encode($result),
+        200,
+        array('Content-Type' => 'application/json')
+    );
+}
+
+function failure($code, $message) {
+    $result['success'] = false;
+    $result['message'] = $message;
+
+    return new Response(
+        json_encode($result),
+        $code,
+        array('Content-Type' => 'application/json')
+    );
+}
+
 $app->get('/{class}', function (Request $request, $class) use ($app) {
     $page = $request->get('page') ?: 1;
     $start = $request->get('start') ?: 0;
@@ -52,18 +73,14 @@ $app->get('/{class}', function (Request $request, $class) use ($app) {
 
         $result['total'] = $app['idiorm']->getTable($class)->count();
 
-        $result['success'] = true;
+        $response = success($result);
     } catch (Exception $exc) {
         $app['monolog']->addError($exc->getMessage());
-        $result['message'] = $exc->getMessage();
-        $result['success'] = false;
+
+        $response = failure(409, $exc->getMessage());
     }
 
-    return new Response(
-        json_encode($result),
-        200,
-        array('Content-Type' => 'application/json')
-    );
+    return $response;
 });
 
 $app->put('/{class}/{id}', function (Request $request, $class, $id) use ($app) {
